@@ -3,9 +3,19 @@ import { manualPromise } from '../src/utils'
 
 
 export default class Worker {
+  static createClass(f) {
+    return class FWorker extends this {
+      processTask = f
+    }
+  }
 
-  constructor(processTask, options = {}) {
-    this.processTask = processTask
+  static create(f) {
+    const worker = new this()
+    worker.processTask = f
+    return worker 
+  }
+
+  constructor(options = {}) {
     this.queue = options.queue || new Queue()
     this.working = false
   }
@@ -20,6 +30,10 @@ export default class Worker {
   async execute(task) {
     const { promise } = await this.push(task)
     return await promise
+  }
+
+  async processTask(task) {
+    throw new TypeError(`${this.constructor.name} does not implement the \`async processTask(task)\` method`)
   }
 
   start() {

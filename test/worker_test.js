@@ -13,12 +13,12 @@ class TestWorker extends Worker {
     super(options)
 
     for (let method of [ 'push', 'processTask', '_loop' ]) {
-      this[method] = sinon.spy(this[method].bind(this))
+      this[method] = sinon.spy(this[method])
     }
   }
 
-  async processTask({ n }) {
-    return n + 1
+  processTask(task) {
+    return task.n + 1
   }
 }
 
@@ -31,6 +31,39 @@ describe("Worker", function() {
 
       const queue = new Queue()
       expect(new TestWorker({ queue }).queue).to.equal(queue)
+    })
+  })
+
+  describe("static .create()", function() {
+    it("should create a worker that runs a function", async function() {
+      const f = () => 123
+      const worker = Worker.create(f).start()
+      
+      expect(await worker.execute()).to.equal(123)
+    })
+
+    it("should create instances of own class", function() {
+      class SubWorker extends Worker {}
+      const worker = SubWorker.create(() => 1)
+
+      expect(worker).instanceOf(SubWorker)
+    })
+  })
+
+  describe("static .createClass()", function() {
+    it("should create a Worker class that runs a function", async function() {
+      const f = () => 123
+      const WorkerClass = Worker.createClass(f)
+      const worker = new WorkerClass().start()
+
+      expect(await worker.execute()).to.equal(123)
+    })
+
+    it("should create subclasses of own class", function() {
+      class SubWorker extends Worker {}
+      const WorkerClass = SubWorker.createClass(() => 1)
+
+      expect(Object.getPrototypeOf(WorkerClass)).to.equal(SubWorker)
     })
   })
 
