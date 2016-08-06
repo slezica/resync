@@ -4,12 +4,9 @@ import { manualPromise } from '../src/utils'
 
 export default class Worker {
 
-  constructor(options = {}) {
-    if (this.constructor === Worker) {
-      throw new Error("Worker is an abstract class. Subclass it and implement the `async processTask(task)` method")
-    }
-
-    this.queue   = options.queue || new Queue()
+  constructor(processTask, options = {}) {
+    this.processTask = processTask
+    this.queue = options.queue || new Queue()
     this.working = false
   }
 

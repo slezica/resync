@@ -86,7 +86,6 @@ describe("Worker", function() {
   })
 
   describe(".start()", function() {
-
     it("should immediately invoke `_loop()`", function() {
       const worker = new TestWorker().start()
       expect(worker._loop).calledOnce
