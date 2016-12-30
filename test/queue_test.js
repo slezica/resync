@@ -1,6 +1,8 @@
 import 'babel-polyfill'
 import chai, { expect } from 'chai'
 
+import { tickTock } from './utils'
+
 import Queue from '../src/Queue'
 
 
@@ -34,11 +36,15 @@ describe("Queue", function() {
       const queue = new Queue()
       const whenGet = queue.get()
 
-      expect(queue.readers.length).to.equal(1)
-      expect(queue.readers[0].promise.state).to.equal('pending')
+      let itemFound = null
+      whenGet.then(item => itemFound = item)
+
+      expect(itemFound).to.be.null
 
       await queue.put('item')
-      expect(await whenGet).to.equal('item')
+      await tickTock()
+
+      expect(itemFound).to.equal('item')
     })
 
     it("should return items in the order they were put()", async function() {
@@ -76,17 +82,24 @@ describe("Queue", function() {
 
       const whenPut = queue.put('item2')
 
+      let finishedPut = false
+      whenPut.then(_ => finishedPut = true)
+
       expect(queue.size).to.equal(1)
-      expect(queue.writers.length).to.equal(1)
-      expect(queue.writers[0].promise.state).to.equal('pending')
+      expect(finishedPut).to.be.false
+
+      await tickTock() // waiting with the queue full should have no effect
+
+      expect(queue.size).to.equal(1)
+      expect(finishedPut).to.be.false
 
       await queue.get()
-      expect(queue.writers.length).to.equal(0)
+      await tickTock() // now, after a slot was freed, whenPut should settle
+
+      expect(queue.size).to.equal(1)
+      expect(finishedPut).to.be.true
 
       await whenPut
-
-      expect(queue.size).to.equal(1)
-      await queue.get()
     })
   })
 })

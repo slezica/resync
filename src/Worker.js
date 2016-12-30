@@ -56,7 +56,7 @@ export default class Worker {
       let { task, promise } = await this.queue.get()
 
       if (! this.working) {
-        await this.queue.put({ task, promise }, { first: true })
+        await this.queue.putFirst({ task, promise }) // restore item to queue
         return
       }
 

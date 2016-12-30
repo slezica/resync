@@ -1,62 +1,37 @@
 import ProxyPromise from 'proxy-promise'
 
+import Semaphore from './Semaphore'
 
-// TODO investigate if this can be implemented with Semaphore (consider case
-// of queue with maxSize 0 and always having an empty `.items`)
 
 export default class Queue {
 
   constructor(maxSize = Infinity) {
-    if (! isValidMaxSize(maxSize)) {
-      throw new TypeError(`Queue maxSize should be Infinity, a positive integer or 0, not ${maxSize}`)
-    }
-
+    this.items = []
     this.maxSize = maxSize
-    this.items   = []
-    this.readers = []
-    this.writers = []
+    this.sem = new Semaphore(0, maxSize)
   }
 
   get size() {
     return this.items.length
   }
 
-  async put(item, { first = false } = {}) {
-    if (this.readers.length > 0) {
-      this.readers.shift().promise.resolve(item)
+  async put(item) {
+    await this.sem.up()
+    this.items.push(item)
+  }
 
-    } else if (this.size < this.maxSize) {
-      first ? this.items.unshift(item) : this.items.push(item)
-
-    } else {
-      const promise = new ProxyPromise()
-      this.writers.push({ promise })
-
-      await promise
-      return this.put(item)
-    }
+  async putFirst(item) {
+    await this.sem.up()
+    this.items.unshift(item)
   }
 
   async get() {
-    if (this.size > 0) {
-      const item = this.items.shift()
-
-      if (this.writers.length > 0) {
-        this.writers.shift().promise.resolve()
-      }
-
-      return item
-
-    } else {
-      const promise = new ProxyPromise()
-      this.readers.push({ promise })
-
-      return await promise
-    }
+    await this.sem.down()
+    return this.items.shift()
   }
-}
 
-
-function isValidMaxSize(maxSize) {
-  return maxSize === Infinity || (Number.isInteger(maxSize) && maxSize >= 0)
+  async getLast() {
+    await this.sem.down()
+    return this.items.pop()
+  }
 }
