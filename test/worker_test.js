@@ -4,6 +4,8 @@ import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
 chai.use(sinonChai)
 
+import { tickTock } from './utils'
+
 import Queue from '../src/Queue'
 import Worker from '../src/Worker'
 
@@ -89,7 +91,8 @@ describe("Worker", function() {
       const worker = new TestWorker().start()
       await worker.push({})
 
-      await eventually(() => expect(worker.processTask).calledOnce)
+      await tickTock()
+      expect(worker.processTask).calledOnce
     })
 
     it("should resolve the promise to the result of `processTask()`", async function() {
@@ -137,7 +140,9 @@ describe("Worker", function() {
 
       expect(worker.processTask).not.called
       worker.start()
-      await eventually(() => expect(worker.processTask).calledOnce)
+
+      await tickTock()
+      expect(worker.processTask).calledOnce
     })
   })
 
@@ -145,7 +150,9 @@ describe("Worker", function() {
     it("should prevent calls to `processTask()`", async function() {
       const worker = new TestWorker().start().stop()
       worker.execute(1)
-      await eventually(() => expect(worker.processTask.callCount).to.equal(0))
+
+      await tickTock()
+      expect(worker.processTask.callCount).to.equal(0)
     })
 
     it("should immediately stop calls to `processTask()`", async function() {
@@ -154,7 +161,8 @@ describe("Worker", function() {
       worker.execute(1)
       worker.stop()
 
-      await eventually(() => expect(worker.processTask.callCount).to.equal(0))
+      await tickTock()
+      expect(worker.processTask.callCount).to.equal(0)
     })
 
     it("should return last task to the queue if invoked just in time", async function() {
@@ -176,16 +184,9 @@ describe("Worker", function() {
       worker.start()
       await worker.push(123)
 
-      await eventually(() => expect(worker.queue.items[0].task).to.equal(123))
+      await tickTock()
+      expect(worker.queue.items[0].task).to.equal(123)
     })
   })
 })
-
-
-function eventually(f) {
-  // process.nextTick() will wait until all pending events have been processed
-  return new Promise(resolve =>
-    process.nextTick(() => { f(); resolve() })
-  )
-}
 
