@@ -4,8 +4,8 @@ import sinon from 'sinon'
 import sinonChai from 'sinon-chai'
 chai.use(sinonChai)
 
-import Queue from '../src/queue'
-import Worker from '../src/worker'
+import Queue from '../src/Queue'
+import Worker from '../src/Worker'
 
 
 class TestWorker extends Worker {
@@ -38,7 +38,7 @@ describe("Worker", function() {
     it("should create a worker that runs a function", async function() {
       const f = () => 123
       const worker = Worker.create(f).start()
-      
+
       expect(await worker.execute()).to.equal(123)
     })
 
@@ -88,14 +88,14 @@ describe("Worker", function() {
     it("should eventually invoke `processTask()`", async function() {
       const worker = new TestWorker().start()
       await worker.push({})
-      
+
       await eventually(() => expect(worker.processTask).calledOnce)
     })
 
     it("should resolve the promise to the result of `processTask()`", async function() {
       const worker = new TestWorker().start()
       const { promise } = await worker.push({ n: 5 })
-  
+
       expect(await promise).to.equal(6)
     })
 
@@ -134,7 +134,7 @@ describe("Worker", function() {
     it("should hold calls to `processTask()`", async function() {
       const worker = new TestWorker()
       worker.execute(1)
-      
+
       expect(worker.processTask).not.called
       worker.start()
       await eventually(() => expect(worker.processTask).calledOnce)
@@ -159,7 +159,7 @@ describe("Worker", function() {
 
     it("should return last task to the queue if invoked just in time", async function() {
       const worker = new TestWorker()
-      
+
       // This is the case we're testing:
       // - The worker gets a task from the front of the queue, plans to execute it
       // - `stop()` is asynchronously called

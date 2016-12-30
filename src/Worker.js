@@ -1,18 +1,19 @@
-import Queue from './queue'
-import { manualPromise } from '../src/utils'
+import ProxyPromise from 'proxy-promise'
+
+import Queue from './Queue'
 
 
 export default class Worker {
-  static createClass(f) {
+  static createClass(func, options = {}) {
     return class FWorker extends this {
-      processTask = f
+      processTask = func
     }
   }
 
-  static create(f) {
-    const worker = new this()
-    worker.processTask = f
-    return worker 
+  static create(func, options = {}) {
+    const worker = new this(options)
+    worker.processTask = func
+    return worker
   }
 
   constructor(options = {}) {
@@ -21,7 +22,7 @@ export default class Worker {
   }
 
   async push(task) {
-    const promise = manualPromise()
+    const promise = new ProxyPromise()
     await this.queue.put({ task, promise })
 
     return { task, promise }

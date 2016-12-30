@@ -1,4 +1,4 @@
-import { manualPromise } from './utils'
+import ProxyPromise from 'proxy-promise'
 
 
 export default class Semaphore {
@@ -25,7 +25,7 @@ export default class Semaphore {
   async down() {
     if (this.value === 0) {
       // We need to wait for up() to be called
-      const promise = manualPromise()
+      const promise = new ProxyPromise()
       this.downWaiters.push({ promise })
 
       await promise
@@ -42,7 +42,7 @@ export default class Semaphore {
   async up() {
     if (this.value === this.maxValue) {
       // We need to wait for down() to be called
-      const promise = manualPromise()
+      const promise = new ProxyPromise()
       this.upWaiters.push({ promise })
 
       await promise

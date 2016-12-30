@@ -1,4 +1,4 @@
-import { manualPromise } from './utils'
+import ProxyPromise from 'proxy-promise'
 
 
 // TODO investigate if this can be implemented with Semaphore (consider case
@@ -10,7 +10,7 @@ export default class Queue {
     if (! isValidMaxSize(maxSize)) {
       throw new TypeError(`Queue maxSize should be Infinity, a positive integer or 0, not ${maxSize}`)
     }
-  
+
     this.maxSize = maxSize
     this.items   = []
     this.readers = []
@@ -29,9 +29,9 @@ export default class Queue {
       first ? this.items.unshift(item) : this.items.push(item)
 
     } else {
-      const promise = manualPromise()
+      const promise = new ProxyPromise()
       this.writers.push({ promise })
-      
+
       await promise
       return this.put(item)
     }
@@ -48,9 +48,9 @@ export default class Queue {
       return item
 
     } else {
-      const promise = manualPromise()
+      const promise = new ProxyPromise()
       this.readers.push({ promise })
-      
+
       return await promise
     }
   }

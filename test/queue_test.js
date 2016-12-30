@@ -1,8 +1,7 @@
 import 'babel-polyfill'
 import chai, { expect } from 'chai'
 
-import Queue from '../src/queue'
-import { manualPromise } from '../src/utils'
+import Queue from '../src/Queue'
 
 
 describe("Queue", function() {
@@ -44,7 +43,7 @@ describe("Queue", function() {
 
     it("should return items in the order they were put()", async function() {
       const queue = new Queue()
-      
+
       await queue.put('item1')
       await queue.put('item2')
 
@@ -66,7 +65,7 @@ describe("Queue", function() {
       expect(queue.size).to.equal(0)
 
       await queue.put('item')
-      
+
       expect(queue.size).to.equal(1)
       expect(queue.items[0]).to.equal('item')
     })
@@ -76,7 +75,7 @@ describe("Queue", function() {
       await queue.put('item1')
 
       const whenPut = queue.put('item2')
-      
+
       expect(queue.size).to.equal(1)
       expect(queue.writers.length).to.equal(1)
       expect(queue.writers[0].promise.state).to.equal('pending')

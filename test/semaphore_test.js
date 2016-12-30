@@ -1,8 +1,7 @@
 import 'babel-polyfill'
 import chai, { expect } from 'chai'
 
-import Semaphore from '../src/semaphore'
-import { manualPromise } from '../src/utils'
+import Semaphore from '../src/Semaphore'
 
 
 describe("Semaphore", function() {
@@ -88,7 +87,7 @@ describe("Semaphore", function() {
     it("should not block if value < maxValue", function() {
       const sem = new Semaphore(0, 1)
       sem.up()
-      
+
       expect(sem.value).to.equal(1)
       expect(sem.upWaiters).to.be.empty
     })
@@ -96,7 +95,7 @@ describe("Semaphore", function() {
     it("should block if value == maxValue", function() {
       const sem = new Semaphore(0, 0)
       sem.up()
-      
+
       expect(sem.value).to.equal(0)
       expect(sem.upWaiters.length).to.equal(1)
       expect(sem.upWaiters[0].promise.state).to.equal('pending')
@@ -106,7 +105,7 @@ describe("Semaphore", function() {
       const sem = new Semaphore(0)
       const whenDown = sem.down()
       sem.up()
-      
+
       expect(sem.value).to.equal(0)
       expect(sem.downWaiters).to.be.empty
 
