@@ -30,6 +30,16 @@ export default class Queue {
     return this.items.shift()
   }
 
+  async getIf(predicate) {
+    await this.sem.down()
+
+    if (predicate()) {
+      return this.items.shift()
+    } else {
+      return undefined
+    }
+  }
+
   async getLast() {
     await this.sem.down()
     return this.items.pop()
