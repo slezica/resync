@@ -11,22 +11,17 @@ export default class Pool {
     this.isWorking = false
   }
 
-  async execute(task) {
+  async execute(func) {
     this.start()
-    const promise = new ProxyPromise()
 
-    async function wrappedTask() {
-      try {
-        const value = await Promise.resolve(task())
-        promise.resolve(value)
-      } catch (error) {
-        promise.reject(error)
-      }
+    const task = {
+      execute: func,
+      promise: new ProxyPromise()
     }
 
-    await this.queue.put(wrappedTask)
+    await this.queue.put(task)
 
-    return promise.then(value => value)
+    return task.promise.then(value => value)
   }
 
   start() {
@@ -42,10 +37,15 @@ export default class Pool {
 
   async _runWorker() {
     while (true) {
-      let nextTask = await this.queue.getIf(() => this.isWorking)
-      if (! nextTask) return
+      let task = await this.queue.getIf(() => this.isWorking)
+      if (! task) return
 
-      await nextTask()
+      try {
+        const value = await Promise.resolve(task.execute())
+        task.promise.resolve(value)
+      } catch (error) {
+        task.promise.reject(error)
+      }
     }
   }
 }
