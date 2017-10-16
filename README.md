@@ -1,4 +1,4 @@
-# resync
+# resync-kit
 
 Old-style synchronization tools for modern Javascript.
 
@@ -11,3 +11,7 @@ Includes:
 Does not include:
 
 - Documentation. Sorry.
+
+### Install
+
+    npm install resync-kit
