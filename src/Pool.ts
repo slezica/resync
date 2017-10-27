@@ -11,14 +11,22 @@ export type Task = {
 
 export default class Pool {
 
-  size: number
-  queue: Queue<Task>
-  isWorking: boolean
+  protected _size: number
+  protected _queue: Queue<Task>
+  protected _isStarted: boolean
 
   constructor(size: number) {
-    this.size = size
-    this.queue = new Queue()
-    this.isWorking = false
+    this._size = size
+    this._queue = new Queue()
+    this._isStarted = false
+  }
+
+  get size() {
+    return this._size
+  }
+
+  get isStarted() {
+    return this._isStarted
   }
 
   async execute(func: Function) {
@@ -29,25 +37,25 @@ export default class Pool {
       promise: new ProxyPromise()
     }
 
-    await this.queue.put(task)
+    await this._queue.put(task)
 
     return task.promise.then(value => value)
   }
 
   start() {
-    if (! this.isWorking) {
-      this.isWorking = true
-      for (let i = 0; i < this.size; i++) this._runWorker()
+    if (! this._isStarted) {
+      this._isStarted = true
+      for (let i = 0; i < this._size; i++) this._runWorker()
     }
   }
 
   stop() {
-    this.isWorking = false
+    this._isStarted = false
   }
 
   async _runWorker() {
     while (true) {
-      let task = await this.queue.getIf(() => this.isWorking)
+      let task = await this._queue.getIf(() => this._isStarted)
       if (! task) return
 
       try {

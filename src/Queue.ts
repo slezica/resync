@@ -5,47 +5,51 @@ import Semaphore from './Semaphore'
 
 export default class Queue<T> {
 
-  maxSize: number
-  items: Array<T>
-  sem: Semaphore
+  protected _maxSize: number
+  protected _items: Array<T>
+  protected _sem: Semaphore
 
   constructor(maxSize = Infinity) {
-    this.maxSize = maxSize
-    this.items = []
-    this.sem = new Semaphore(0, maxSize)
+    this._maxSize = maxSize
+    this._items = []
+    this._sem = new Semaphore(0, maxSize)
   }
 
   get size() {
-    return this.items.length
+    return this._items.length
+  }
+
+  get maxSize() {
+    return this._maxSize
   }
 
   async put(item: T) {
-    await this.sem.up()
-    this.items.push(item)
+    await this._sem.up()
+    this._items.push(item)
   }
 
   async putFirst(item: T) {
-    await this.sem.up()
-    this.items.unshift(item)
+    await this._sem.up()
+    this._items.unshift(item)
   }
 
   async get() {
-    await this.sem.down()
-    return this.items.shift()
+    await this._sem.down()
+    return this._items.shift()
   }
 
   async getIf(predicate: () => boolean) {
-    await this.sem.down()
+    await this._sem.down()
 
     if (predicate()) {
-      return this.items.shift()
+      return this._items.shift()
     } else {
       return undefined
     }
   }
 
   async getLast() {
-    await this.sem.down()
-    return this.items.pop()
+    await this._sem.down()
+    return this._items.pop()
   }
 }

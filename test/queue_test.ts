@@ -3,7 +3,14 @@ import { expect } from 'chai'
 
 import { tickTock } from './utils'
 
-import Queue from '../src/Queue'
+import OriginalQueue from '../src/Queue'
+
+
+class Queue<T> extends OriginalQueue<T> {
+  get items() {
+    return this._items
+  }
+}
 
 
 describe("Queue", function() {

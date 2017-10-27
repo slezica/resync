@@ -1,7 +1,18 @@
 import 'mocha'
 import { expect } from 'chai'
 
-import Semaphore from '../src/Semaphore'
+import OriginalSemaphore from '../src/Semaphore'
+
+
+class Semaphore extends OriginalSemaphore {
+  get downWaiters() {
+    return this._downWaiters
+  }
+
+  get upWaiters() {
+    return this._upWaiters
+  }
+}
 
 
 describe("Semaphore", function() {
