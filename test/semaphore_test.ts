@@ -1,5 +1,5 @@
-import 'babel-polyfill'
-import chai, { expect } from 'chai'
+import 'mocha'
+import { expect } from 'chai'
 
 import Semaphore from '../src/Semaphore'
 
@@ -16,7 +16,6 @@ describe("Semaphore", function() {
       expect(new Semaphore(5).value).to.equal(5)
 
       expect(() => new Semaphore(null)).to.throw(TypeError)
-      expect(() => new Semaphore('x')).to.throw(TypeError)
       expect(() => new Semaphore(3.5)).to.throw(TypeError)
       expect(() => new Semaphore(NaN)).to.throw(TypeError)
     })
@@ -31,7 +30,6 @@ describe("Semaphore", function() {
       expect(new Semaphore(0, Infinity).maxValue).to.equal(Infinity)
 
       expect(() => new Semaphore(0, null)).to.throw(TypeError)
-      expect(() => new Semaphore(0, 'x')).to.throw(TypeError)
       expect(() => new Semaphore(0, 3.5)).to.throw(TypeError)
       expect(() => new Semaphore(0, NaN)).to.throw(TypeError)
     })

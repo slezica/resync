@@ -3,11 +3,15 @@ import ProxyPromise from 'proxy-promise'
 import Semaphore from './Semaphore'
 
 
-export default class Queue {
+export default class Queue<T> {
+
+  maxSize: number
+  items: Array<T>
+  sem: Semaphore
 
   constructor(maxSize = Infinity) {
-    this.items = []
     this.maxSize = maxSize
+    this.items = []
     this.sem = new Semaphore(0, maxSize)
   }
 
@@ -15,12 +19,12 @@ export default class Queue {
     return this.items.length
   }
 
-  async put(item) {
+  async put(item: T) {
     await this.sem.up()
     this.items.push(item)
   }
 
-  async putFirst(item) {
+  async putFirst(item: T) {
     await this.sem.up()
     this.items.unshift(item)
   }
@@ -30,7 +34,7 @@ export default class Queue {
     return this.items.shift()
   }
 
-  async getIf(predicate) {
+  async getIf(predicate: () => boolean) {
     await this.sem.down()
 
     if (predicate()) {

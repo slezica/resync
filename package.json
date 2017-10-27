@@ -4,10 +4,11 @@
   "author": "Santiago Lezica <salezica@gmail.com> (https://github.com/slezica/)",
   "description": "Old-style synchronization tools for modern Javascript",
   "license": "MIT",
-  "main": "dist/index.js",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
   "scripts": {
-    "build": "babel src --out-dir dist",
-    "test": "mocha --compilers js:babel-register ${@:test/}",
+    "build": "tsc",
+    "test": "mocha --compilers ts:ts-node/register",
     "prepublish": "npm run build"
   },
   "repository": {
@@ -19,20 +20,18 @@
   ],
   "keywords": [],
   "devDependencies": {
-    "babel-cli": "^6.11.4",
-    "babel-preset-env": "^1.6.0",
-    "chai": "^3.5.0",
+    "@types/chai": "^4.0.4",
+    "@types/mocha": "^2.2.44",
+    "@types/sinon": "^2.3.7",
+    "@types/sinon-chai": "^2.7.29",
+    "chai": "^4.1.2",
     "mocha": "^2.5.3",
     "sinon": "^1.17.5",
-    "sinon-chai": "^2.8.0"
-  },
-  "babel": {
-    "presets": [
-      "env"
-    ]
+    "sinon-chai": "^2.8.0",
+    "ts-node": "^3.3.0",
+    "typescript": "^2.5.3"
   },
   "dependencies": {
-    "babel-polyfill": "^6.26.0",
-    "proxy-promise": "^1.0.2"
+    "proxy-promise": "^1.1.2"
   }
 }

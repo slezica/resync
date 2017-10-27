@@ -1,7 +1,17 @@
 import ProxyPromise from 'proxy-promise'
 
 
+export type Waiter = {
+  promise: ProxyPromise<void>
+}
+
+
 export default class Semaphore {
+
+  value: number
+  maxValue: number
+  downWaiters: Array<Waiter>
+  upWaiters: Array<Waiter>
 
   constructor(value = 0, maxValue = Infinity) {
     if (! isValidValue(value)) {
@@ -25,7 +35,7 @@ export default class Semaphore {
   async down() {
     if (this.value === 0) {
       // We need to wait for up() to be called
-      const promise = new ProxyPromise()
+      const promise = new ProxyPromise<void>()
       this.downWaiters.push({ promise })
 
       await promise
@@ -42,7 +52,7 @@ export default class Semaphore {
   async up() {
     if (this.value === this.maxValue) {
       // We need to wait for down() to be called
-      const promise = new ProxyPromise()
+      const promise = new ProxyPromise<void>()
       this.upWaiters.push({ promise })
 
       await promise
@@ -59,11 +69,11 @@ export default class Semaphore {
 }
 
 
-function isValidValue(value) {
+function isValidValue(value: number) {
   return Number.isInteger(value) && value >= 0
 }
 
 
-function isValidMaxValue(maxValue) {
+function isValidMaxValue(maxValue: number) {
   return maxValue === Infinity || (Number.isInteger(maxValue) && maxValue >= 0)
 }

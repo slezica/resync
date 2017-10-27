@@ -1,5 +1,5 @@
-import 'babel-polyfill'
-import chai, { expect } from 'chai'
+import 'mocha'
+import { expect } from 'chai'
 
 import { tickTock, range } from './utils'
 
@@ -28,9 +28,9 @@ describe("Pool", function() {
       const pool = new Pool(3)
 
       let idCounter = 0
-      const executionOrder = []
+      const executionOrder: Array<number> = []
 
-      async function task(id) {
+      async function task(id: number) {
         executionOrder.push(id)
       }
 
@@ -46,7 +46,7 @@ describe("Pool", function() {
       const pool = new Pool(3)
 
       let activeTasks = 0
-      const activeTaskHistory = []
+      const activeTaskHistory: Array<number> = []
 
       async function task() {
         activeTaskHistory.push(++activeTasks)

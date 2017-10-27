@@ -1,5 +1,5 @@
-import 'babel-polyfill'
-import chai, { expect } from 'chai'
+import 'mocha'
+import { expect } from 'chai'
 
 import { tickTock } from './utils'
 
@@ -19,7 +19,6 @@ describe("Queue", function() {
       expect(new Queue(Infinity).maxSize).to.equal(Infinity)
 
       expect(() => new Queue(null)).to.throw(TypeError)
-      expect(() => new Queue('x')).to.throw(TypeError)
       expect(() => new Queue(3.5)).to.throw(TypeError)
       expect(() => new Queue(NaN)).to.throw(TypeError)
     })

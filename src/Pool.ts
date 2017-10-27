@@ -3,15 +3,25 @@ import ProxyPromise from 'proxy-promise'
 import Queue from './Queue'
 
 
+export type Task = {
+  execute: Function
+  promise: ProxyPromise<any>
+}
+
+
 export default class Pool {
 
-  constructor(size) {
+  size: number
+  queue: Queue<Task>
+  isWorking: boolean
+
+  constructor(size: number) {
     this.size = size
     this.queue = new Queue()
     this.isWorking = false
   }
 
-  async execute(func) {
+  async execute(func: Function) {
     this.start()
 
     const task = {
@@ -43,6 +53,7 @@ export default class Pool {
       try {
         const value = await Promise.resolve(task.execute())
         task.promise.resolve(value)
+
       } catch (error) {
         task.promise.reject(error)
       }
